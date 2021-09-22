@@ -96,6 +96,8 @@ class Trainer:
                         (epoch+1)*len(train_loader),
                         accelerator.unwrap_model(g_xy),
                         accelerator.unwrap_model(g_yx),
+                        accelerator.unwrap_model(d_x),
+                        accelerator.unwrap_model(d_y),
                         optimizer_g,
                         optimizer_d
                     )
