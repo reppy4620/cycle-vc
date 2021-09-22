@@ -108,9 +108,9 @@ class Trainer:
         tracker = Tracker()
         bar = tqdm(desc=f'Epoch: {epoch + 1}', total=len(loader), disable=not accelerator.is_main_process)
         for i, batch in enumerate(loader):
-            loss_g, loss_d = self._handle_batch(config, tracker, batch, models, optimizers, schedulers, accelerator)
+            self._handle_batch(config, tracker, batch, models, optimizers, schedulers, accelerator)
             bar.update()
-            bar.set_postfix_str(f'G Loss: {loss_g:.6f}, D Loss: {loss_d:.6f}')
+            self.set_loss(bar, tracker)
         bar.set_postfix_str(f'Mean G Loss: {tracker.loss_g.mean():.6f}, Mean D Loss: {tracker.loss_d.mean():.6f}')
         if accelerator.is_main_process:
             self.write_losses(epoch, writer, tracker, mode='train')
@@ -241,3 +241,6 @@ class Trainer:
     def write_losses(self, epoch, writer, tracker, mode='train'):
         for k, v in tracker.items():
             writer.add_scalar(f'{mode}/{k}', v.mean(), epoch)
+
+    def set_loss(self, bar, tracker):
+        bar.set_postfix_str(','.join([f'{k}: {v.mean():.6f}' for k, v in tracker.items()]))
