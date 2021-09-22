@@ -133,14 +133,14 @@ class Trainer:
             g_xy.eval(); g_yx.eval(); d_x.eval(); d_y.eval()
 
         x, y = batch
-        x_fake = g_yx(y, x)
-        y_fake = g_xy(x, y)
+        x_fake = g_yx(y)
+        y_fake = g_xy(x)
 
-        cycle_x = g_yx(y_fake, x)
-        cycle_y = g_xy(x_fake, y)
+        cycle_x = g_yx(y_fake)
+        cycle_y = g_xy(x_fake)
 
-        id_x = g_yx(x, x)
-        id_y = g_xy(y, y)
+        id_x = g_yx(x)
+        id_y = g_xy(y)
 
         # D
         pred_x_real, _ = d_x(x)

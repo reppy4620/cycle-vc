@@ -19,24 +19,11 @@ class Generator(nn.Module):
                 kernel_size=3
             ) for _ in range(n_residuals)
         ])
-
-        self.layer3 = ConvTFANLayer(
-            n_mel=n_mel,
-            in_channels=base_channels * 2,
-            out_channels=base_channels * 4,
-            tfan_channels=base_channels * 2,
-            kernel_size=5
-        )
-        self.layer4 = ConvTFANLayer(
-            n_mel=n_mel,
-            in_channels=base_channels * 2,
-            out_channels=base_channels * 4,
-            tfan_channels=base_channels * 2,
-            kernel_size=5
-        )
+        self.layer3 = Conv1dLayer(base_channels * 2, mag=2)
+        self.layer4 = Conv1dLayer(base_channels * 2, mag=2)
         self.out = nn.Conv1d(base_channels * 2, n_mel, 1)
 
-    def forward(self, x, y):
+    def forward(self, x):
         x = self.in_layer(x)
         x = self.layer1(x)
         x = self.layer2(x)
@@ -44,7 +31,7 @@ class Generator(nn.Module):
         for layer in self.residuals:
             x = layer(x)
 
-        x = self.layer3(x, y)
-        x = self.layer4(x, y)
+        x = self.layer3(x)
+        x = self.layer4(x)
         x = self.out(x)
         return x
