@@ -111,7 +111,7 @@ class Trainer:
             self._handle_batch(config, tracker, batch, models, optimizers, schedulers, accelerator)
             bar.update()
             self.set_loss(bar, tracker)
-        bar.set_postfix_str(f'Mean G Loss: {tracker.loss_g.mean():.6f}, Mean D Loss: {tracker.loss_d.mean():.6f}')
+        self.set_loss(bar, tracker)
         if accelerator.is_main_process:
             self.write_losses(epoch, writer, tracker, mode='train')
         bar.close()
@@ -243,4 +243,4 @@ class Trainer:
             writer.add_scalar(f'{mode}/{k}', v.mean(), epoch)
 
     def set_loss(self, bar, tracker):
-        bar.set_postfix_str(','.join([f'{k}: {v.mean():.6f}' for k, v in tracker.items()]))
+        bar.set_postfix_str(', '.join([f'{k}: {v.mean():.6f}' for k, v in tracker.items()]))
