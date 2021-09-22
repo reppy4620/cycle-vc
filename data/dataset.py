@@ -41,9 +41,9 @@ class VCDataset(Dataset):
     def __getitem__(self, idx):
         if self.x_length > self.y_length:
             x_path = self.x_files[idx]
-            y_path = self.y_files[idx % self.x_length]
+            y_path = self.y_files[idx % self.y_length]
         else:
-            x_path = self.x_files[idx % self.y_length]
+            x_path = self.x_files[idx % self.x_length]
             y_path = self.y_files[idx]
         x = self.load_mel(x_path, self.x_stats)
         y = self.load_mel(y_path, self.y_stats)
