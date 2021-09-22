@@ -1,0 +1,5 @@
+src_dir: ../../dataset/vc/gan/msk/wav
+tgt_dir: ../../dataset/vc/gan/jsut/wav
+
+src_train_length: 500
+tgt_train_length: 500
