@@ -62,17 +62,17 @@ def main():
         plt.subplot(311)
         plt.gca().title.set_text('MSK')
         plt.imshow(src, aspect='auto', origin='lower')
-        plt.subplot(313)
+        plt.subplot(312)
         plt.gca().title.set_text('JSUT')
         plt.imshow(tgt, aspect='auto', origin='lower')
-        plt.subplot(315)
+        plt.subplot(313)
         plt.gca().title.set_text('GEN')
         plt.imshow(gen, aspect='auto', origin='lower')
         plt.savefig(path)
         plt.close()
 
-    src_files = list(sorted(src_dir.glob('*.wav')))[config.data.x_train_length]
-    tgt_files = list(sorted(tgt_dir.glob('*.wav')))[config.data.y_train_length]
+    src_files = list(sorted(src_dir.glob('*.wav')))[config.data.x_train_length:]
+    tgt_files = list(sorted(tgt_dir.glob('*.wav')))[config.data.y_train_length:]
 
     to_mel = TacotronSTFT()
 

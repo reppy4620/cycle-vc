@@ -22,6 +22,8 @@ class VCDataset(Dataset):
 
         self.to_mel = TacotronSTFT()
 
+        self.cnt = 0
+
     def __len__(self):
         return self.x_length if self.x_length > self.y_length else self.y_length
 
@@ -39,6 +41,9 @@ class VCDataset(Dataset):
         return mel[:, b:e]
 
     def __getitem__(self, idx):
+        if self.cnt == 0:
+            random.shuffle(self.y_files)
+        self.cnt = (self.cnt + 1) % self.y_length
         if self.x_length > self.y_length:
             x_path = self.x_files[idx]
             y_path = self.y_files[idx % self.y_length]
