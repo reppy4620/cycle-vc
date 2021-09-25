@@ -145,13 +145,11 @@ class Trainer:
         # D
         pred_x_real, _ = d_x(x)
         pred_x_fake, _ = d_x(x_fake.detach())
-        pred_x_fake2, _ = d_x(cycle_x.detach())
         pred_y_real, _ = d_y(y)
         pred_y_fake, _ = d_y(y_fake.detach())
-        pred_y_fake2, _ = d_y(cycle_y.detach())
 
-        loss_d_x = d_loss(pred_x_real, pred_x_fake, pred_x_fake2)
-        loss_d_y = d_loss(pred_y_real, pred_y_fake, pred_y_fake2)
+        loss_d_x = d_loss(pred_x_real, pred_x_fake)
+        loss_d_y = d_loss(pred_y_real, pred_y_fake)
         loss_d = loss_d_x + loss_d_y
         if optimizers is not None:
             optimizer_d.zero_grad()
@@ -164,15 +162,13 @@ class Trainer:
         # G
         _, fm_x_real = d_x(x)
         pred_x_fake, fm_x_fake = d_x(x_fake)
-        pred_x_fake2, fm_x_fake2 = d_x(cycle_x)
         _, fm_y_real = d_y(y)
         pred_y_fake, fm_y_fake = d_y(y_fake)
-        pred_y_fake2, fm_y_fake2 = d_y(y)
-        loss_g_x_gan = g_loss(pred_x_fake) + g_loss(pred_x_fake2)
-        loss_g_y_gan = g_loss(pred_y_fake) + g_loss(pred_y_fake2)
+        loss_g_x_gan = g_loss(pred_x_fake)
+        loss_g_y_gan = g_loss(pred_y_fake)
         loss_g_gan = loss_g_x_gan + loss_g_y_gan
-        loss_fm_x = feature_map_loss(fm_x_real, fm_x_fake) + feature_map_loss(fm_x_real, fm_x_fake2)
-        loss_fm_y = feature_map_loss(fm_y_real, fm_y_fake) + feature_map_loss(fm_y_real, fm_y_fake2)
+        loss_fm_x = feature_map_loss(fm_x_real, fm_x_fake)
+        loss_fm_y = feature_map_loss(fm_y_real, fm_y_fake)
         loss_fm = loss_fm_x + loss_fm_y
         loss_cycle = F.l1_loss(cycle_x, x) + F.l1_loss(cycle_y, y)
         loss_id = F.l1_loss(id_x, x) + F.l1_loss(id_y, y)

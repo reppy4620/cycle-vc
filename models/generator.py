@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from .commons import GLU, Conv1dLayer, ResidualBlock, ConvTFANLayer
+from .commons import GLU, Conv1dLayer, ResidualBlock
 
 
 class Generator(nn.Module):
@@ -29,7 +29,7 @@ class Generator(nn.Module):
         x = self.layer2(x)
 
         for layer in self.residuals:
-            x = layer(x)
+            x += layer(x)
 
         x = self.layer3(x)
         x = self.layer4(x)

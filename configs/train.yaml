@@ -27,7 +27,7 @@ data:
 model:
 
   generator:
-    base_channels: 64
+    base_channels: 128
     n_residuals: 6
 
   discriminator:

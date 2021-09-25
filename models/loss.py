@@ -2,11 +2,10 @@ import torch
 import torch.nn.functional as F
 
 
-def d_loss(pred_real, pred_fake, pred_fake2):
+def d_loss(pred_real, pred_fake):
     loss_real = torch.relu(1 - pred_real).mean()
     loss_fake = torch.relu(1 + pred_fake).mean()
-    loss_fake2 = torch.relu(1 + pred_fake2).mean()
-    loss = loss_real + loss_fake + loss_fake2
+    loss = loss_real + loss_fake
     return loss
 
 
