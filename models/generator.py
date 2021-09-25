@@ -29,7 +29,7 @@ class Generator(nn.Module):
         x = self.layer2(x)
 
         for layer in self.residuals:
-            x += layer(x)
+            x = layer(x)
 
         x = self.layer3(x)
         x = self.layer4(x)

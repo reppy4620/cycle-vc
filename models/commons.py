@@ -53,11 +53,13 @@ class ResidualBlock(nn.Module):
         self.norm2 = nn.InstanceNorm1d(channels)
 
     def forward(self, x):
+        residual = x
         x = self.conv1(x)
         x = self.norm1(x)
         x = self.act(x)
         x = self.conv2(x)
         x = self.norm2(x)
+        x = x + residual
         return x
 
 

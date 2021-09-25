@@ -108,7 +108,8 @@ class Trainer:
         tracker = Tracker()
         bar = tqdm(desc=f'Epoch: {epoch + 1}', total=len(loader), disable=not accelerator.is_main_process)
         for i, batch in enumerate(loader):
-            self._handle_batch(config, tracker, batch, models, optimizers, schedulers, accelerator)
+            with torch.autograd.set_detect_anomaly(True):
+                self._handle_batch(config, tracker, batch, models, optimizers, schedulers, accelerator)
             bar.update()
             self.set_loss(bar, tracker)
         self.set_loss(bar, tracker)
