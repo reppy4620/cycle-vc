@@ -42,6 +42,48 @@ class Conv2dLayer(nn.Module):
         return x
 
 
+class To1dLayer(nn.Module):
+    def __init__(self, channels):
+        super().__init__()
+        self.conv = nn.Conv1d(channels, 256, 1)
+        self.norm = nn.InstanceNorm1d(256)
+
+    def forward(self, x):
+        x = x.view(x.size(0), -1, x.size(-1))
+        x = self.conv(x)
+        x = self.norm(x)
+        return x
+
+
+class To2dLayer(nn.Module):
+    def __init__(self, channels):
+        super().__init__()
+        self.conv = nn.Conv1d(256, channels, 1)
+        self.norm = nn.InstanceNorm1d(channels)
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.norm(x)
+        x = x.view(x.size(0), 256, -1, x.size(-1))
+        return x
+
+
+class UpsampleLayer(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(UpsampleLayer, self).__init__()
+        self.conv = nn.Conv2d(in_channels, out_channels, 5, padding=2)
+        self.pixel_shuffle = nn.PixelShuffle(upscale_factor=2)
+        self.norm = nn.InstanceNorm2d(out_channels)
+        self.act = GLU(dim=1)
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.pixel_shuffle(x)
+        x = self.norm(x)
+        x = self.act(x)
+        return x
+
+
 class ResidualBlock(nn.Module):
     def __init__(self, channels, kernel_size=3):
         super(ResidualBlock, self).__init__()

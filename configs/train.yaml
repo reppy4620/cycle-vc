@@ -5,7 +5,7 @@ resume_checkpoint: false
 train:
   fp16: false
   batch_size: 64
-  num_epochs: 12500
+  num_epochs: 2000
   save_interval: 100
   lambda_cycle: 10
   lambda_id: 5
@@ -27,7 +27,7 @@ data:
 model:
 
   generator:
-    base_channels: 128
+    base_channels: 64
     n_residuals: 6
 
   discriminator:

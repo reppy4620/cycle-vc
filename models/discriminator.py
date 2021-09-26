@@ -20,8 +20,7 @@ class Discriminator(nn.Module):
             Conv2dLayer(base_channels * 4, mag=4, kernel_size=3, stride=2, spectral_norm=spectral_norm),
             Conv2dLayer(base_channels * 8, mag=2, kernel_size=3, stride=1, spectral_norm=spectral_norm),
         ])
-        self.pool = nn.AdaptiveAvgPool2d(1)
-        self.out = nn.Linear(base_channels * 8, 1)
+        self.out = nn.Conv2d(base_channels * 8, 1, kernel_size=(1, 3), padding=(0, 1))
 
     def forward(self, x):
         fms = list()
@@ -30,6 +29,6 @@ class Discriminator(nn.Module):
         for layer in self.layers:
             x = layer(x)
             fms.append(x)
-        x = self.pool(x).squeeze()
         x = self.out(x)
+        x = x.squeeze(1)
         return x, fms
