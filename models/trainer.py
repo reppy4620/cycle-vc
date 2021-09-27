@@ -155,7 +155,7 @@ class Trainer:
         if optimizers is not None:
             optimizer_d.zero_grad()
             accelerator.backward(loss_d)
-            accelerator.clip_grad_norm_(d_x.parameters(), 5)
+            accelerator.clip_grad_orm_(d_x.parameters(), 5)
             accelerator.clip_grad_norm_(d_y.parameters(), 5)
             optimizer_d.step()
             scheduler_d.step()
