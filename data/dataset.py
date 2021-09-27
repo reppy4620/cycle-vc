@@ -8,7 +8,7 @@ from transform import TacotronSTFT
 
 
 class VCDataset(Dataset):
-    def __init__(self, x_files, y_files, x_stats, y_stats, segment_length, shuffle=True):
+    def __init__(self, x_files, y_files, x_stats, y_stats, segment_length):
         self.x_files = x_files
         self.y_files = y_files
 
@@ -21,9 +21,6 @@ class VCDataset(Dataset):
         self.segment_length = segment_length
 
         self.to_mel = TacotronSTFT()
-
-        self.cnt = 0
-        self.shuffle = shuffle
 
     def __len__(self):
         return self.x_length if self.x_length > self.y_length else self.y_length
@@ -42,9 +39,6 @@ class VCDataset(Dataset):
         return mel[:, b:e]
 
     def __getitem__(self, idx):
-        if self.cnt == 0 and self.shuffle:
-            random.shuffle(self.y_files)
-        self.cnt = (self.cnt + 1) % self.y_length
         if self.x_length > self.y_length:
             x_path = self.x_files[idx]
             y_path = self.y_files[idx % self.y_length]
