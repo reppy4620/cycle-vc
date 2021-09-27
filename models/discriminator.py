@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from .commons import GLU, Conv2dLayer
+from .commons import GLU, Conv2dLayer, SimpleDecoder
 
 
 class Discriminator(nn.Module):
@@ -18,17 +18,20 @@ class Discriminator(nn.Module):
             Conv2dLayer(base_channels, mag=4, kernel_size=3, stride=2, spectral_norm=spectral_norm),
             Conv2dLayer(base_channels * 2, mag=4, kernel_size=3, stride=2, spectral_norm=spectral_norm),
             Conv2dLayer(base_channels * 4, mag=4, kernel_size=3, stride=2, spectral_norm=spectral_norm),
-            Conv2dLayer(base_channels * 8, mag=2, kernel_size=3, stride=1, spectral_norm=spectral_norm),
+            Conv2dLayer(base_channels * 8, mag=2, kernel_size=(1, 5), stride=1, padding=(0, 2), spectral_norm=spectral_norm),
         ])
         self.out = nn.Conv2d(base_channels * 8, 1, kernel_size=(1, 3), padding=(0, 1))
 
-    def forward(self, x):
+        self.decoder = SimpleDecoder(channels=base_channels * 8)
+
+    def forward(self, x, need_recon=True):
         fms = list()
         x = x.unsqueeze(1)
         x = self.in_layer(x)
         for layer in self.layers:
             x = layer(x)
             fms.append(x)
+        recon = None if not need_recon else self.decoder(x)
         x = self.out(x)
         x = x.squeeze(1)
-        return x, fms
+        return x, fms, recon

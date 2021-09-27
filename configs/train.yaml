@@ -1,10 +1,10 @@
 seed: 42
 model_dir: ../../models/cycle-vc
-resume_checkpoint: true
+resume_checkpoint: false
 
 train:
   fp16: false
-  batch_size: 32
+  batch_size: 64
   num_epochs: 12500
   save_interval: 100
   lambda_cycle: 10
@@ -32,7 +32,7 @@ model:
 
   discriminator:
     base_channels: 64
-    spectral_norm: true
+    spectral_norm: false
 
 optimizer:
   lr: 1.0

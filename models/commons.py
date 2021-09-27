@@ -26,9 +26,11 @@ class Conv1dLayer(nn.Module):
 
 
 class Conv2dLayer(nn.Module):
-    def __init__(self, channels, mag, kernel_size=5, stride=1, spectral_norm=False):
+    def __init__(self, channels, mag, kernel_size=5, stride=1, padding=None, spectral_norm=False):
         super(Conv2dLayer, self).__init__()
-        conv = nn.Conv2d(channels, channels * mag, kernel_size, stride=stride, padding=kernel_size // 2)
+        if padding is None:
+            padding = kernel_size // 2
+        conv = nn.Conv2d(channels, channels * mag, kernel_size, stride=stride, padding=padding)
         if spectral_norm:
             conv = nn.utils.spectral_norm(conv)
         self.conv = conv
@@ -148,4 +150,25 @@ class ConvTFANLayer(nn.Module):
         x = self.conv(x)
         x = self.tfan(x, y)
         x = self.act(x)
+        return x
+
+
+class SimpleDecoder(nn.Module):
+    def __init__(self, channels):
+        super(SimpleDecoder, self).__init__()
+        self.layers = nn.ModuleList([
+            nn.Sequential(
+                nn.UpsamplingNearest2d(scale_factor=2),
+                nn.Conv2d(channels // (2**i), channels // (2**i), kernel_size=3, padding=1),
+                nn.BatchNorm2d(channels // (2**i)),
+                GLU(dim=1)
+            ) for i in range(3)
+        ])
+        self.out = nn.Conv2d(channels // (2 ** 3), 1, kernel_size=1)
+
+    def forward(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        x = self.out(x)
+        x = x.squeeze(1)
         return x

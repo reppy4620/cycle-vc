@@ -143,14 +143,15 @@ class Trainer:
         id_y = g_xy(y)
 
         # D
-        pred_x_real, _ = d_x(x)
-        pred_x_fake, _ = d_x(x_fake.detach())
-        pred_y_real, _ = d_y(y)
-        pred_y_fake, _ = d_y(y_fake.detach())
+        pred_x_real, _, recon_x = d_x(x)
+        pred_x_fake, *_ = d_x(x_fake.detach())
+        pred_y_real, _, recon_y = d_y(y)
+        pred_y_fake, *_ = d_y(y_fake.detach())
 
         loss_d_x = d_loss(pred_x_real, pred_x_fake)
         loss_d_y = d_loss(pred_y_real, pred_y_fake)
-        loss_d = loss_d_x + loss_d_y
+        loss_recon = F.l1_loss(x, recon_x) + F.l1_loss(y, recon_y)
+        loss_d = loss_d_x + loss_d_y + loss_recon
         if optimizers is not None:
             optimizer_d.zero_grad()
             accelerator.backward(loss_d)
@@ -160,9 +161,9 @@ class Trainer:
             scheduler_d.step()
 
         # G
-        _, fm_x_real = d_x(x)
+        _, fm_x_real, _ = d_x(x)
         pred_x_fake, fm_x_fake = d_x(x_fake)
-        _, fm_y_real = d_y(y)
+        _, fm_y_real, _ = d_y(y)
         pred_y_fake, fm_y_fake = d_y(y_fake)
         loss_g_x_gan = g_loss(pred_x_fake)
         loss_g_y_gan = g_loss(pred_y_fake)
@@ -183,13 +184,13 @@ class Trainer:
 
         tracker.update(
             loss_d=loss_d.item(),
+            loss_recon=loss_recon.item(),
             loss_g=loss_g.item(),
             loss_g_gan=loss_g_gan.item(),
             loss_fm=loss_fm.item(),
             loss_cycle=loss_cycle.item(),
             loss_id=loss_id.item()
         )
-        return loss_g, loss_d
 
     def prepare_data(self, data_config):
         x_dir = Path(data_config.x_dir)
