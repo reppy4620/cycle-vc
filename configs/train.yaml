@@ -4,8 +4,8 @@ resume_checkpoint: true
 
 train:
   fp16: false
-  batch_size: 64
-  num_epochs: 5000
+  batch_size: 32
+  num_epochs: 12500
   save_interval: 100
   lambda_cycle: 10
   lambda_id: 5
