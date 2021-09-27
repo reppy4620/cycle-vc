@@ -162,9 +162,9 @@ class Trainer:
 
         # G
         _, fm_x_real, _ = d_x(x)
-        pred_x_fake, fm_x_fake = d_x(x_fake)
+        pred_x_fake, fm_x_fake, _ = d_x(x_fake)
         _, fm_y_real, _ = d_y(y)
-        pred_y_fake, fm_y_fake = d_y(y_fake)
+        pred_y_fake, fm_y_fake, _ = d_y(y_fake)
         loss_g_x_gan = g_loss(pred_x_fake)
         loss_g_y_gan = g_loss(pred_y_fake)
         loss_g_gan = loss_g_x_gan + loss_g_y_gan
