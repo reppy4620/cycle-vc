@@ -32,6 +32,9 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    x_stats = torch.load(config.data.x_stats)
+    y_stats = torch.load(config.data.y_stats)
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     checkpoint = torch.load(f'{args.model_dir}/latest.ckpt', map_location=device)
     g_xy = Generator(n_mel=config.data.n_mel, **config.model.generator)
@@ -40,12 +43,14 @@ def main():
     hifi_gan = load_hifi_gan(args.hifi_gan)
     g_xy, hifi_gan = g_xy.eval().to(device), hifi_gan.eval().to(device)
 
+    @torch.no_grad()
     def infer(x):
         x = x.to(device)
-        with torch.no_grad():
-            y = g_xy(x)
-            y_wav = hifi_gan(y)
-            y, y_wav = y.cpu(), y_wav.squeeze(1).cpu()
+        x = (x - x_stats['mean']) / x_stats['std']
+        y = g_xy(x)
+        y = y * y_stats['std'] + y_stats['mean']
+        y_wav = hifi_gan(y)
+        y, y_wav = y.cpu(), y_wav.squeeze(1).cpu()
         return y, y_wav
 
     def save_wav(wav, path):
@@ -58,7 +63,7 @@ def main():
         )
 
     def save_mel_three_attn(src, tgt, gen, path):
-        plt.figure(figsize=(20, 7))
+        plt.figure(figsize=(10, 7))
         plt.subplot(311)
         plt.gca().title.set_text('MSK')
         plt.imshow(src, aspect='auto', origin='lower')
@@ -71,8 +76,8 @@ def main():
         plt.savefig(path)
         plt.close()
 
-    src_files = list(sorted(src_dir.glob('*.wav')))[config.data.x_train_length:]
-    tgt_files = list(sorted(tgt_dir.glob('*.wav')))[config.data.y_train_length:]
+    src_files = list(sorted(src_dir.glob('*.wav')))#[config.data.x_train_length:]
+    tgt_files = list(sorted(tgt_dir.glob('*.wav')))#[config.data.y_train_length:]
 
     to_mel = TacotronSTFT()
 
