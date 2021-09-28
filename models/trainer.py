@@ -143,10 +143,10 @@ class Trainer:
         id_y = g_xy(y)
 
         # D
-        pred_x_real, _, recon_x = d_x(x)
-        pred_x_fake, *_ = d_x(x_fake.detach())
-        pred_y_real, _, recon_y = d_y(y)
-        pred_y_fake, *_ = d_y(y_fake.detach())
+        pred_x_real, _, recon_x = d_x(x, need_recon=True)
+        pred_x_fake, *_ = d_x(x_fake.detach(), need_recon=False)
+        pred_y_real, _, recon_y = d_y(y, need_recon=True)
+        pred_y_fake, *_ = d_y(y_fake.detach(), need_recon=False)
 
         loss_d_x = d_loss(pred_x_real, pred_x_fake)
         loss_d_y = d_loss(pred_y_real, pred_y_fake)
@@ -161,10 +161,10 @@ class Trainer:
             scheduler_d.step()
 
         # G
-        _, fm_x_real, _ = d_x(x)
-        pred_x_fake, fm_x_fake, _ = d_x(x_fake)
-        _, fm_y_real, _ = d_y(y)
-        pred_y_fake, fm_y_fake, _ = d_y(y_fake)
+        _, fm_x_real, _ = d_x(x, need_recon=False)
+        pred_x_fake, fm_x_fake, _ = d_x(x_fake, need_recon=False)
+        _, fm_y_real, _ = d_y(y, need_recon=False)
+        pred_y_fake, fm_y_fake, _ = d_y(y_fake, need_recon=False)
         loss_g_x_gan = g_loss(pred_x_fake)
         loss_g_y_gan = g_loss(pred_y_fake)
         loss_g_gan = loss_g_x_gan + loss_g_y_gan
